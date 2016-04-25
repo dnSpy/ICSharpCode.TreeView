@@ -125,6 +125,10 @@ namespace ICSharpCode.TreeView
 		{
 			get { return Parent == null; }
 		}
+
+		public virtual bool SingleClickExpandsChildren {
+			get { return false; }
+		}
 		
 		bool isHidden;
 		
@@ -167,11 +171,13 @@ namespace ICSharpCode.TreeView
 		#region OnChildrenChanged
 		internal protected virtual void OnChildrenChanged(NotifyCollectionChangedEventArgs e)
 		{
+			var flattener = GetListRoot().treeFlattener;
+
 			if (e.OldItems != null) {
 				foreach (SharpTreeNode node in e.OldItems) {
 					Debug.Assert(node.modelParent == this);
 					node.modelParent = null;
-					Debug.WriteLine("Removing {0} from {1}", node, this);
+					//Debug.WriteLine("Removing {0} from {1}", node, this);
 					SharpTreeNode removeEnd = node;
 					while (removeEnd.modelChildren != null && removeEnd.modelChildren.Count > 0)
 						removeEnd = removeEnd.modelChildren.Last();
@@ -186,7 +192,6 @@ namespace ICSharpCode.TreeView
 					RemoveNodes(node, removeEnd);
 					
 					if (removedNodes != null) {
-						var flattener = GetListRoot().treeFlattener;
 						if (flattener != null) {
 							flattener.NodesRemoved(visibleIndexOfRemoval, removedNodes);
 						}
@@ -213,7 +218,6 @@ namespace ICSharpCode.TreeView
 					
 					insertionPos = node;
 					if (node.isVisible) {
-						var flattener = GetListRoot().treeFlattener;
 						if (flattener != null) {
 							flattener.NodesInserted(GetVisibleIndexForNode(node), node.VisibleDescendantsAndSelf());
 						}
@@ -659,6 +663,10 @@ namespace ICSharpCode.TreeView
 		
 		public event PropertyChangedEventHandler PropertyChanged;
 		
+		protected bool HasPropertyChangedHandlers {
+			get { return PropertyChanged != null; }
+		}
+
 		public void RaisePropertyChanged(string name)
 		{
 			if (PropertyChanged != null) {

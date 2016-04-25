@@ -32,9 +32,12 @@ namespace ICSharpCode.TreeView
 		}
 
 		public event NotifyCollectionChangedEventHandler CollectionChanged;
-		
-		public void RaiseCollectionChanged(NotifyCollectionChangedEventArgs e)
+
+		Dictionary<int, SharpTreeNode> nodeCache = new Dictionary<int, SharpTreeNode>();
+
+		void RaiseCollectionChanged(NotifyCollectionChangedEventArgs e)
 		{
+			nodeCache.Clear();
 			if (CollectionChanged != null)
 				CollectionChanged(this, e);
 		}
@@ -65,7 +68,14 @@ namespace ICSharpCode.TreeView
 			get {
 				if (index < 0 || index >= this.Count)
 					throw new ArgumentOutOfRangeException();
-				return SharpTreeNode.GetNodeByVisibleIndex(root, includeRoot ? index : index + 1);
+
+				SharpTreeNode node;
+				if (nodeCache.TryGetValue(index, out node))
+					return node;
+
+				node = SharpTreeNode.GetNodeByVisibleIndex(root, includeRoot ? index : index + 1);
+				nodeCache[index] = node;
+				return node;
 			}
 			set {
 				throw new NotSupportedException();
