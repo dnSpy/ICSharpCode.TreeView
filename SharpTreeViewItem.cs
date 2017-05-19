@@ -151,6 +151,7 @@ namespace ICSharpCode.TreeView
 
 			ReleaseMouseCapture();
 			if (wasSelected) {
+				wasSelected = false;
 				// Make sure the TV doesn't steal focus when double clicking something that will
 				// trigger setting focus to eg. the text editor.
 				if (!ignoreOnMouseLeftButtonDown)
