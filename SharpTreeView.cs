@@ -158,7 +158,7 @@ namespace ICSharpCode.TreeView
 				}
 				if (!updatesLocked && selectedOldItems != null) {
 					var list = SelectedItems.Cast<SharpTreeNode>().Except(selectedOldItems).ToList();
-					UpdateFocusedNode(list, Math.Max(0, e.OldStartingIndex - 1));
+					UpdateFocusedNode(list, Math.Max(0, Math.Min(Items.Count - 1, e.OldStartingIndex + e.OldItems.Count - 1)));
 				}
 			}
 		}
@@ -168,8 +168,6 @@ namespace ICSharpCode.TreeView
 			if (updatesLocked) return;
 			SetSelectedItems(newSelection ?? Enumerable.Empty<SharpTreeNode>());
 			if (SelectedItem == null) {
-				// if we removed all selected nodes, then move the focus to the node 
-				// preceding the first of the old selected nodes
 				SelectedIndex = topSelectedIndex;
 				if (SelectedItem != null && IsKeyboardFocusWithin)
 					FocusNode((SharpTreeNode)SelectedItem);
