@@ -225,17 +225,52 @@ namespace ICSharpCode.TreeView
 				}
 			}
 			if (lastVisibleChild != node) {
-				// Make the the expanded children are visible; but don't scroll down
-				// to much (keep node itself visible)
-				base.ScrollIntoView(lastVisibleChild);
-				// For some reason, this only works properly when delaying it...
-				Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(
-					delegate {
-						base.ScrollIntoView(node);
-					}));
+				Debug.Assert(flattener != null);
+				if (flattener == null)
+					return;
+				// A new scrollViewer.ViewportHeight value is available at the earliest at Render prio.
+				// If there are many empty lines, it will equal the number of visible items (eg. 5,
+				// but viewport can show eg. 10).
+				Dispatcher.BeginInvoke(DispatcherPriority.Render, new Action(() => {
+					var itemsPerPage = STVUTILS.GetItemsPerPage(this, 0);
+					int nodeIndex = flattener.IndexOf(node);
+					int lastVisibleChildIndex = flattener.IndexOf(lastVisibleChild);
+					Debug.Assert(nodeIndex >= 0 && lastVisibleChildIndex >= 0);
+					if (itemsPerPage > 0 && nodeIndex >= 0 && lastVisibleChildIndex >= 0) {
+						int lastIndex = Math.Min(lastVisibleChildIndex, nodeIndex + itemsPerPage - 1);
+						ScrollIntoView(Items[lastIndex]);
+						Dispatcher.BeginInvoke(DispatcherPriority.Loaded, new Action(() => ScrollIntoView(node)));
+					}
+				}));
 			}
 		}
-		
+
+		static class STVUTILS {
+			static T FindVisualChild<T>(DependencyObject obj) where T : DependencyObject {
+				int childrenCount = VisualTreeHelper.GetChildrenCount(obj);
+				for (int i = 0; i < childrenCount; i++) {
+					var child = VisualTreeHelper.GetChild(obj, i);
+					if (child is T res)
+						return res;
+
+					res = FindVisualChild<T>(child);
+					if (res != null)
+						return res;
+				}
+
+				return null;
+			}
+
+			public static ScrollViewer TryGetScrollViewer(ListBox lb) => FindVisualChild<ScrollViewer>(lb);
+
+			public static int GetItemsPerPage(ListBox lb, int defaultValue) {
+				var scrollViewer = TryGetScrollViewer(lb);
+				if (scrollViewer == null)
+					return defaultValue;
+				return (int)Math.Max(1, Math.Floor(scrollViewer.ViewportHeight));
+			}
+		}
+
 		protected override void OnKeyDown(KeyEventArgs e)
 		{
 			SharpTreeViewItem container = e.OriginalSource as SharpTreeViewItem;
