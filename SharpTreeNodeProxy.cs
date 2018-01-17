@@ -26,6 +26,15 @@ using System.ComponentModel;
 using System.Linq;
 
 namespace ICSharpCode.TreeView {
+	struct ObjectChangedEventArgs {
+		public SharpTreeNode OldNode { get; }
+		public SharpTreeNode NewNode { get; }
+		public ObjectChangedEventArgs(SharpTreeNode oldNode, SharpTreeNode newNode) {
+			OldNode = oldNode;
+			NewNode = newNode;
+		}
+	}
+
 	internal class SharpTreeNodeProxy : CustomTypeDescriptor {
 		static SharpTreeNodeProxy() {
 			descMap = new Dictionary<string, IPropDesc>();
@@ -63,6 +72,7 @@ namespace ICSharpCode.TreeView {
 			if (Object != null)
 				Object.PropertyChanged -= OnPropertyChanged;
 
+			var oldNode = Object;
 			Object = obj;
 
 			if (obj == null)
@@ -77,7 +87,7 @@ namespace ICSharpCode.TreeView {
 			}
 
 			if (ObjectChanged != null)
-				ObjectChanged(this, EventArgs.Empty);
+				ObjectChanged(this, new ObjectChangedEventArgs(oldNode, obj));
 		}
 
 		void OnPropertyChanged(object sender, PropertyChangedEventArgs e) {
@@ -86,7 +96,7 @@ namespace ICSharpCode.TreeView {
 				desc.OnValueChanged(this);
 		}
 
-		public event EventHandler ObjectChanged;
+		public event EventHandler<ObjectChangedEventArgs> ObjectChanged;
 
 		public bool IsNull { get; private set; }
 		public SharpTreeNode Object { get; private set; }

@@ -180,6 +180,7 @@ namespace ICSharpCode.TreeView
 				var nv = item2.NodeView;
 				if (nv != null)
 					nv.DataContext = null;
+				item2.ClearValue(DataContextProperty);
 			}
 			base.ClearContainerForItemOverride(element, item);
 		}

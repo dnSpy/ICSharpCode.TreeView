@@ -91,29 +91,22 @@ namespace ICSharpCode.TreeView
 		{
 			if (newAdaptor != null) {
 				newAdaptor.ObjectChanged += AdaptorObjectChanged;
-				if (newAdaptor.Object != null) {
+				if (newAdaptor.Object != null)
 					newAdaptor.Object.PropertyChanged += Node_PropertyChanged;
-					oldNode = newAdaptor.Object;
-				}
 			}
 			if (oldAdaptor != null) {
 				oldAdaptor.ObjectChanged -= AdaptorObjectChanged;
-				if (oldAdaptor.Object != null) {
+				if (oldAdaptor.Object != null)
 					oldAdaptor.Object.PropertyChanged -= Node_PropertyChanged;
-				}
 			}
 		}
 
-		SharpTreeNode oldNode;
-		void AdaptorObjectChanged(object sender, EventArgs e) {
-			if (oldNode != null)
-				oldNode.PropertyChanged -= Node_PropertyChanged;
+		void AdaptorObjectChanged(object sender, ObjectChangedEventArgs e) {
+			if (e.OldNode != null)
+				e.OldNode.PropertyChanged -= Node_PropertyChanged;
 
-			var adaptor = (SharpTreeNodeProxy)sender;
-			if (adaptor.Object != null) {
-				adaptor.Object.PropertyChanged += Node_PropertyChanged;
-				oldNode = adaptor.Object;
-			}
+			if (e.NewNode != null)
+				e.NewNode.PropertyChanged += Node_PropertyChanged;
 
 			UpdateTemplate();
 		}
