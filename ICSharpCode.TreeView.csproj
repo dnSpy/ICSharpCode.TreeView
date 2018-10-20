@@ -16,12 +16,16 @@
     </Page>
   </ItemGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition=" '$(IsDotNetFramework)' == 'true' ">
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Xaml" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
+   </ItemGroup>
+
+  <ItemGroup Condition=" '$(IsDotNetCore)' == 'true' ">
+    <FrameworkReference Include="Microsoft.DesktopUI"/>
   </ItemGroup>
 
 </Project>
