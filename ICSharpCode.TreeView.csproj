@@ -7,6 +7,7 @@
     <AssemblyOriginatorKeyFile>ICSharpCode.NRefactory.snk</AssemblyOriginatorKeyFile>
     <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,9 +24,5 @@
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
    </ItemGroup>
-
-  <ItemGroup Condition=" '$(IsDotNetCore)' == 'true' ">
-    <FrameworkReference Include="Microsoft.DesktopUI"/>
-  </ItemGroup>
 
 </Project>
