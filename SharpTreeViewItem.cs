@@ -145,7 +145,7 @@ namespace ICSharpCode.TreeView
 						SingleClickAction(new Tuple<MouseButtonEventArgs, SharpTreeNode>(e, Node));
 				}
 				else
-					clicker.MouseUp(SingleClickAction, DoubleClickAction);
+					doubleClickHandler.MouseUp(SingleClickAction, DoubleClickAction);
 			}
 
 			ReleaseMouseCapture();
