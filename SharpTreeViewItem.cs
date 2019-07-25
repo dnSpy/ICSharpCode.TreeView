@@ -90,6 +90,7 @@ namespace ICSharpCode.TreeView
 
 		Point startPoint;
 		bool wasSelected;
+		bool wasDoubleClick;
 
 		protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
 		{
@@ -128,6 +129,22 @@ namespace ICSharpCode.TreeView
 					}
 				}
 			}
+		}
+
+		private void SingleClickAction(Tuple<MouseButtonEventArgs, SharpTreeNode> context)
+		{
+			var node = context.Item2;
+			if (!node.IsExpanded && node.SingleClickExpandsChildren)
+				if (!node.IsRoot || ParentTreeView.ShowRootExpander)
+					node.IsExpanded = !node.IsExpanded;
+		}
+
+		private void DoubleClickAction(Tuple<MouseButtonEventArgs, SharpTreeNode> context)
+		{
+			var e = context.Item1;
+			var node = context.Item2;
+			if (node != null)
+				Node.ActivateItem(e);
 		}
 
 		protected override void OnMouseLeftButtonUp(MouseButtonEventArgs e)
