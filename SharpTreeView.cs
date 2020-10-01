@@ -428,6 +428,18 @@ namespace ICSharpCode.TreeView
 				e.Handled = true;
 				ShowPreview(target.Item, target.Place);
 			}
+
+			var sv = STVUTILS.TryGetScrollViewer(this);
+			double tolerance = item.NodeView.ActualHeight / 2;
+			double verticalPos = e.GetPosition(this).Y;
+
+			// take the difference between tolerance and position to scroll more rapidly as tolerance gap closes
+			if (verticalPos < tolerance) {
+				sv.ScrollToVerticalOffset(sv.VerticalOffset - (tolerance - verticalPos));
+			}
+			else if (verticalPos > ActualHeight - tolerance) {
+				sv.ScrollToVerticalOffset(sv.VerticalOffset + (verticalPos - ActualHeight + tolerance));
+			}
 		}
 
 		internal void HandleDrop(SharpTreeViewItem item, DragEventArgs e)
@@ -614,11 +626,11 @@ namespace ICSharpCode.TreeView
 
 				if (place == DropPlace.Before) {
 					if (index > 0) {
-						secondNodeView = (ItemContainerGenerator.ContainerFromIndex(index - 1) as SharpTreeViewItem).NodeView;
+						secondNodeView = (ItemContainerGenerator.ContainerFromIndex(index - 1) as SharpTreeViewItem)?.NodeView;
 					}
 				}
 				else if (index + 1 < flattener.Count) {
-					secondNodeView = (ItemContainerGenerator.ContainerFromIndex(index + 1) as SharpTreeViewItem).NodeView;
+					secondNodeView = (ItemContainerGenerator.ContainerFromIndex(index + 1) as SharpTreeViewItem)?.NodeView;
 				}
 				
 				var w = p1.X + previewNodeView.ActualWidth - p.X;
